@@ -1,0 +1,6 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/home/neri/Downloads/Wordle/libs/gson-2.10.jar"
+    ]
+}

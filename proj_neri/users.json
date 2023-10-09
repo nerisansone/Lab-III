@@ -1,0 +1,26 @@
+[
+  {
+    "username": "neri",
+    "password": "neri",
+    "play_this_word": false,
+    "games_played": 6,
+    "games_won": 5,
+    "victory_rate": 83,
+    "victory_streak": 3,
+    "max_victory_streak": 3,
+    "guess_distribution": {
+      "1": 5,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0
+    }
+  }
+]
