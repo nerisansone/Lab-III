@@ -13,11 +13,20 @@ import java.util.regex.Pattern;
 
 
 public class WordleClient {
+    public static int port;
+    public static String host;
+    public static String group;
+    public static int port_2;
+    public static final String config = "client_config.properties";
     public static void main(String[] args) throws IOException {
+
+        readConfig();
         
-        InetAddress addr = InetAddress.getByName(null);
-        System.out.println("addr = " + addr);
-        Socket socket = new Socket(addr, WordleServer.PORT);
+        //InetAddress addr = InetAddress.getByName(null);
+        //System.out.println("addr = " + addr);
+        //Socket socket = new Socket(addr, WordleServer.PORT);
+
+        Socket socket = new Socket(host, port);
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         DataInputStream in = new DataInputStream(socket.getInputStream());
         Scanner scan = new Scanner(System.in);
@@ -79,6 +88,8 @@ public class WordleClient {
                     
                     int user_exists = in.readInt();
 
+                    int attempt = 0;
+
                     if (user_exists == 0) {
                         
                         System.out.println("Enter password: ");
@@ -94,6 +105,9 @@ public class WordleClient {
                         } else {
                             
                             System.out.println("\nLogin successful");
+                            Mess_Receiver mess_receiver = new Mess_Receiver(port_2, group);
+                            Thread t = new Thread(mess_receiver);
+                            t.start();
                             boolean logout = false;
 
                             while (!logout) {
@@ -109,19 +123,12 @@ public class WordleClient {
 
                                         if (already_played == 0) {
                                             System.out.println("----[ GAME STARTING ]----");
-                                            WordleGame(scan, in, out);
+                                            attempt = WordleGame(scan, in, out);
                                         } else if (already_played == -1) {
                                             System.out.println("----[ YOU HAVE ALREADY PLAYED THIS WORD ]----");
                                         } else {
                                             System.out.println("----[ ERROR PLAYING GAME ]----");
                                         }
-                                        
-                                        /* String guess = scan.nextLine();
-
-                                        out.writeUTF(guess);
-                                        in.readInt();
-                                        String res = in.readUTF();
-                                        System.out.println(res); */
 
                                     } else if (choice_menu_2 == 2) {
                                         out.writeInt(2);
@@ -129,11 +136,26 @@ public class WordleClient {
 
                                     } else if (choice_menu_2 == 3) {
 
+                                        int player_can_share = in.readInt();
+
+                                        if (player_can_share == 0) {
+                                            out.writeInt(attempt);
+                                            System.out.println("----[ MESSAGE SHARED ]----");
+                                        } 
+                                        else {
+                                            System.out.println("----[ YOU HAVE NOT PLAYED THE WORD YET  ]----");
+                                        }
+                                        continue;
+
                                     } else if (choice_menu_2 == 4) {
+
+                                        mess_receiver.print_mess();
+                                        continue;
 
                                     } else if (choice_menu_2 == 5) {
                                         System.out.println("Logging out...");
                                         out.writeInt(5);
+                                        mess_receiver.close_connection();
                                         logout = true;
                                         flag = false;
                                     } else {
@@ -204,7 +226,7 @@ public class WordleClient {
                 System.out.println("----[ WORD DOES NOT EXIST ]----");
                 continue;
             } else {
-                System.out.println("[ERROR]");
+                System.out.println("----[ ERROR ]----");
                 continue;
             }
 
@@ -213,7 +235,7 @@ public class WordleClient {
 
 
 
-        return 0;
+        return attempts;
     }
 
     public static void print_statistics(DataInputStream in) throws IOException {
@@ -234,4 +256,17 @@ public class WordleClient {
             System.out.println("Number of words guessed with "+i+" attempts : "+guess_distribution);
         }
     }
+
+    public static void readConfig() throws FileNotFoundException, IOException {
+		InputStream input = new FileInputStream(config);
+        Properties prop = new Properties();
+        prop.load(input);
+        port = Integer.parseInt(prop.getProperty("port"));
+        //timer_word = Integer.parseInt(prop.getProperty("timer"));
+        host = prop.getProperty("host");
+        port_2 = Integer.parseInt(prop.getProperty("port_2"));
+        group = prop.getProperty("group");
+        input.close();
+	}
+
 }

@@ -32,11 +32,15 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
 public class WordleServer {
-    public static final int PORT = 8081;
+    public static int port;
+    public static int port_2;
     public static String host;
-    public static int timer_word = 30000; 
+    public static int timer_word = 30000;
+    public static final String config = "server_config.properties";
     public static void main(String[] args) throws IOException {
-        ServerSocket s = new ServerSocket(PORT);
+        readConfig();
+        
+        ServerSocket s = new ServerSocket(port);
         
 
         File users = new File("users.json");
@@ -70,7 +74,7 @@ public class WordleServer {
                 Socket socket = s.accept();
                 System.out.println("Client connected");
                 try {
-                    executor.execute(new menuHandler(socket, host, PORT, properties));
+                    executor.execute(new menuHandler(socket, host, port_2, properties));
                 } catch (Exception e) {
                     System.out.println("----[ ERROR CREATING THREAD ]----");
                 }
@@ -79,7 +83,7 @@ public class WordleServer {
             
         } 
         catch(IOException e){
-            System.out.println("Exception caught when trying to listen on port " + PORT + " or listening for a connection");
+            System.out.println("Exception caught when trying to listen on port " + port + " or listening for a connection");
         }
         s.close();
     }
@@ -93,5 +97,16 @@ public class WordleServer {
         s.close();
         return dictionary;
     }
+
+    public static void readConfig() throws FileNotFoundException, IOException {
+		InputStream input = new FileInputStream(config);
+        Properties prop = new Properties();
+        prop.load(input);
+        port = Integer.parseInt(prop.getProperty("port"));
+        //timer_word = Integer.parseInt(prop.getProperty("timer"));
+        host = prop.getProperty("host");
+        port_2 = Integer.parseInt(prop.getProperty("port_2"));
+        input.close();
+	}
 
 }

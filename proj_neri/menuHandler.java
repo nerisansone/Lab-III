@@ -21,14 +21,14 @@ import java.io.FileWriter;
 
 public class menuHandler implements Runnable {
     Socket socket;
-    String Host;
-    int Port;
+    String host;
+    int port;
     th_properties properties;
 
     public menuHandler(Socket socket, String Host, int Port, th_properties properties) {
         this.socket = socket;
-        this.Host = Host;
-        this.Port = Port;
+        this.host = Host;
+        this.port = Port;
         this.properties = properties;
     }
 
@@ -101,7 +101,21 @@ public class menuHandler implements Runnable {
 
                                 } else if (scelta2 == 3) {
 
+                                    if (login.play_this_word == true) {
+                                        out.writeInt(0);
+
+                                        int attempts = in.readInt();
+
+                                        mess_sender(port, host, attempts, login.username);
+                                    } else {
+                                        out.writeInt(-1); // not played this word yet
+                                    }
+                                    break;
+
                                 } else if (scelta2 == 4) {
+
+                                    break;
+
 
                                 } else if (scelta2 == 5) {
                                     logout = true;
@@ -247,4 +261,35 @@ public class menuHandler implements Runnable {
             out.writeInt(user.guess_distribution.get(i));
         }
     }
+
+    public static void mess_sender(int port, String host, int n_tentativi,String username) throws UnknownHostException {
+        InetAddress ia = InetAddress.getByName(host);
+        
+        try (DatagramSocket ds = new DatagramSocket(0)) {
+            String mess;
+            
+            if(n_tentativi==0){ // 0 tentativi significa che l'utente non ha indovinato la parola
+                mess = username+" didn't guess this word";
+            }
+            else{
+                mess = username+" guessed this word in "+n_tentativi+" attempts";
+            }
+            byte[] data = mess.getBytes("US-ASCII");
+            //metto stringa in un un pacchetto e la invio 
+            DatagramPacket dp = new DatagramPacket(data, data.length, ia, port);
+            ds.send(dp);
+            //non chiudo il datagramsocket tanto ci pensa il try 
+        }
+        catch(SocketException e){
+            e.printStackTrace();
+        }
+        catch(UnsupportedEncodingException e){
+            e.printStackTrace();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
 }
