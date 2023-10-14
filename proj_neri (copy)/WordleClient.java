@@ -8,8 +8,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
-public class WordleClient {
+
+public class WordleClient extends Application {
     public static int port;
     public static String host;
     public static String group;
