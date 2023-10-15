@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.EOFException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -19,10 +18,6 @@ public class WordleClient {
     public static void main(String[] args) throws IOException {
 
         readConfig();
-        
-        //InetAddress addr = InetAddress.getByName(null);
-        //System.out.println("addr = " + addr);
-        //Socket socket = new Socket(addr, WordleServer.PORT);
 
         Socket socket = new Socket(host, port);
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
@@ -179,7 +174,6 @@ public class WordleClient {
                                         out.writeInt(5);
                                         mess_receiver.close_connection();
                                         logout = true;
-                                        flag = false;
                                     } else {
                                         System.out.println("----[ MENU CHOICE DOES NOT EXIST ]----");
                                         continue;

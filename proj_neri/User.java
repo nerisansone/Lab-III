@@ -12,6 +12,7 @@ public class User {
     int victory_rate;
     int victory_streak;
     int max_victory_streak;
+    boolean logged;
     HashMap<Integer,Integer> guess_distribution;
 
     public User(String username, String password) {
@@ -23,6 +24,7 @@ public class User {
         this.victory_rate = 0;
         this.victory_streak = 0;
         this.max_victory_streak = 0;
+        this.logged = false;
         HashMap<Integer,Integer> map = new HashMap<Integer,Integer>();
         map.put(1,0);
         map.put(2,0);

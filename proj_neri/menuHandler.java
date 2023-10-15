@@ -33,6 +33,8 @@ public class menuHandler implements Runnable {
 
         boolean flag;
         User new_user = null;
+        User login = null;
+        String secret_word = "";
 
         try {
             DataOutputStream out = new DataOutputStream(this.socket.getOutputStream());
@@ -65,7 +67,7 @@ public class menuHandler implements Runnable {
                     
                     if (checkUser(username, properties.users_list)) {
                         
-                        User login = findUserByUsername(properties.users_list, username);
+                        login = findUserByUsername(properties.users_list, username);
 
                         System.out.println("User " + login.username +" " + login.password);
 
@@ -74,8 +76,15 @@ public class menuHandler implements Runnable {
                         String password = in.readUTF();
 
                         if (login.password.equals(password)) {
-                            out.writeInt(0); // password is correct
+
+                            if (login.logged == true) {
+                                out.writeInt(-1); // already logged
+                                System.out.println("----[ USER ALREADY LOGGED ]----");
+                                continue;   
+                            }
+                            out.writeInt(0); // password is correct & not logged
                             System.out.println("----[ LOGIN SUCCESSFUL ]----");
+                            login.logged = true;
                             
                             boolean logout = false;
 
@@ -90,6 +99,7 @@ public class menuHandler implements Runnable {
                                     if (login.play_this_word == false) {
                                         login.play_this_word = true;
                                         out.writeInt(0); // start game
+                                        secret_word = properties.word;
                                         WordleGame(login, properties.word, properties.words_list, in, out);
                                     } else {
                                         out.writeInt(-1); // already played this word
@@ -106,7 +116,7 @@ public class menuHandler implements Runnable {
 
                                         int attempts = in.readInt();
 
-                                        mess_sender(port, host, attempts, login.username);
+                                        mess_sender(port, host, attempts, login.username, secret_word);
                                     } else {
                                         out.writeInt(-1); // not played this word yet
                                         continue;
@@ -118,9 +128,8 @@ public class menuHandler implements Runnable {
 
                                 } else if (scelta2 == 5) {
                                     System.out.println("----[ LOGOUT SUCCESSFULL ]----");
+                                    login.logged = false;
                                     logout = true;
-                                    flag = false;
-
                                 }
                             }
                         } else {
@@ -135,7 +144,7 @@ public class menuHandler implements Runnable {
                         continue;
                     }
                 } else if(scelta == 3) {
-                    System.out.println("----[ CLIENT CLOSED ]----");    
+                    System.out.println("----[ CLIENT CLOSED ]----");   
                     break;
                                         
                 }
@@ -144,6 +153,7 @@ public class menuHandler implements Runnable {
             out.close(); 
         } catch (Exception e) {
             System.out.println("----[ CLIENT UNEXPECTEDLY DISCONNECTED ]----");
+            login.logged = false;
         }
     }   
 
@@ -263,18 +273,13 @@ public class menuHandler implements Runnable {
         }
     }
 
-    public static void mess_sender(int port, String host, int n_tentativi,String username) throws UnknownHostException {
+    public static void mess_sender(int port, String host, int n_tentativi,String username, String secret_word) throws UnknownHostException {
         InetAddress ia = InetAddress.getByName(host);
         
         try (DatagramSocket ds = new DatagramSocket(0)) {
-            String mess;
             
-            if(n_tentativi==0){ // 0 tentativi significa che l'utente non ha indovinato la parola
-                mess = username+" didn't guess this word";
-            }
-            else{
-                mess = username+" guessed this word in "+n_tentativi+" attempts";
-            }
+            String mess = username+" guessed the word: "+secret_word+" in "+n_tentativi+" attempts";
+            
             byte[] data = mess.getBytes("US-ASCII");
             //metto stringa in un un pacchetto e la invio 
             DatagramPacket dp = new DatagramPacket(data, data.length, ia, port);
