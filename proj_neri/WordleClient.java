@@ -56,16 +56,30 @@ public class WordleClient {
 
                 if (choice_menu_1 == 1) {
                     
-                    System.out.println("Enter username: ");
+                    System.out.println("----[ ENTER USERNAME ]----");
                     String username = scan.nextLine();
+
+                    while (username.trim().isEmpty()) {
+                        System.out.println("----[ USERNAME CAN NOT BE EMPTY ]----");
+                        System.out.println("---[ INSERT A DIFFERENT USERNAME ]---");
+                        username = scan.nextLine();
+                    }
                     
                     out.writeUTF(username);
                     if (in.readInt() == -1) {
                         System.out.println("Username already exists");
                         continue;
                     }
-                    System.out.println("Enter password: ");
+
+                    System.out.println("----[ ENTER PASSWORD ]----");
                     String password = scan.nextLine();
+
+                    while (password.trim().isEmpty()) {
+                        System.out.println("----[ PASSWORD CAN NOT BE EMPTY ]----");
+                        System.out.println("----[ INSERT A DIFFERENT USERNAME ]---");
+
+                        password = scan.nextLine();
+                    }
                     
                     out.writeUTF(password);          
                     

@@ -239,7 +239,6 @@ public class menuHandler implements Runnable {
             user.victory_streak = 0;
         }
 
-        System.out.println("Faccio stat");
         user.games_played++;
         System.out.println("Won" + user.games_won);
         System.out.println(user.games_played);
