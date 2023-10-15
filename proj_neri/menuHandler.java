@@ -116,8 +116,8 @@ public class menuHandler implements Runnable {
 
                                     continue;
 
-
                                 } else if (scelta2 == 5) {
+                                    System.out.println("----[ LOGOUT SUCCESSFULL ]----");
                                     logout = true;
                                     flag = false;
 
@@ -142,8 +142,8 @@ public class menuHandler implements Runnable {
             }
             in.close();
             out.close(); 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("----[ CLIENT UNEXPECTEDLY DISCONNECTED ]----");
         }
     }   
 
@@ -188,6 +188,7 @@ public class menuHandler implements Runnable {
             String guess = in.readUTF();
             
             if (guess.length() == 10 ) {
+                out.writeInt(0);
                 
                 if(words_list.contains(guess)) {
 
@@ -208,6 +209,7 @@ public class menuHandler implements Runnable {
                     String hints_string = String.join("", hints);
                     
                     out.writeInt(0); // everything is fine
+                    
                     out.writeUTF(hints_string);
 
                     if (word.equals(guess)) {
@@ -227,7 +229,7 @@ public class menuHandler implements Runnable {
                     continue;
                 }
             } else {
-                out.writeUTF("----[ LENGTH ERROR ]----");
+                out.writeInt(-1);
                 continue;
             }
             attempts++; //FINISCI

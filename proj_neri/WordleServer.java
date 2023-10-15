@@ -23,7 +23,7 @@ public class WordleServer {
     public static int port;
     public static int port_2;
     public static String host;
-    public static int timer_word = 30000;
+    public static int timer_word = 120000;
     public static final String config = "server_config.properties";
     public static void main(String[] args) throws IOException {
         readConfig();

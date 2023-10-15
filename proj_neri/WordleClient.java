@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.EOFException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -37,8 +38,8 @@ public class WordleClient {
             System.out.println("Client connected");
             System.out.println("Socket" + socket);
 
-            
-            while (flag) {
+            try {
+                while (flag) {
                 System.out.println("------------------------------------");
                 System.out.println("\nREGISTER [1] \nLOGIN [2]\nEXIT [3]\n");
                 try {
@@ -61,7 +62,7 @@ public class WordleClient {
 
                     while (username.trim().isEmpty()) {
                         System.out.println("----[ USERNAME CAN NOT BE EMPTY ]----");
-                        System.out.println("---[ INSERT A DIFFERENT USERNAME ]---");
+                        System.out.println("---[ INSERT A DIFFERENT USERNAME: ]---");
                         username = scan.nextLine();
                     }
                     
@@ -76,7 +77,7 @@ public class WordleClient {
 
                     while (password.trim().isEmpty()) {
                         System.out.println("----[ PASSWORD CAN NOT BE EMPTY ]----");
-                        System.out.println("----[ INSERT A DIFFERENT USERNAME ]---");
+                        System.out.println("----[ INSERT A DIFFERENT PASSWORD: ]---");
 
                         password = scan.nextLine();
                     }
@@ -137,7 +138,14 @@ public class WordleClient {
 
                                         if (already_played == 0) {
                                             System.out.println("----[ GAME STARTING ]----");
-                                            attempt = WordleGame(scan, in, out);
+
+                                            try{
+                                                attempt = WordleGame(scan, in, out);
+                                            } catch (Exception e) {
+                                                System.out.println("----[ ERROR PLAYING GAME]----");
+                                                flag = false;
+                                                logout = true;
+                                            }
                                         } else if (already_played == -1) {
                                             System.out.println("----[ YOU HAVE ALREADY PLAYED THIS WORD ]----");
                                         } else {
@@ -196,11 +204,15 @@ public class WordleClient {
                     continue;
                 }
             }
+            } catch (SocketException e) {
+                System.out.println("----[ SERVER NOT REACHABLE ]----");
+            }
         }   
         finally {
-            System.out.println("[GAME CLOSED]");
+            System.out.println("----[ GAME CLOSED ]----");
             scan.close();
             socket.close();
+            System.exit(0);
         }
     }
 
@@ -218,12 +230,42 @@ public class WordleClient {
             }
 
             String guess = scanner.nextLine();
+            out.writeUTF(guess);
+            Integer word_is_correct = 0;
+            
 
-            if (guess.length() != 10 ) {
+            /* try {
+                word_is_correct = in.readInt();
+                if (word_is_correct == -1) {
+                    System.out.println("----[ GUESS MUST BE 10 CHARACTERS LONG ]----");
+                    continue;
+                }
+
+                Integer i = in.readInt();
+                if (i == 0) {
+                String hints = in.readUTF();
+
+                    if (guess.equals(hints)) {
+                        System.out.println("----[ YOU WIN ]----");
+                        guessed = true;
+                    } else {
+                        System.out.println(hints);
+                    }  
+                } else if (i == -1) {
+                    System.out.println("----[ WORD DOES NOT EXIST ]----");
+                    continue;
+                } else {
+                    System.out.println("----[ ERROR ]----");
+                    continue;
+                }
+            } catch (Exception e) {
+                System.out.println("----[ ERROR REACHING SERVER ]----");
+                break;
+            } */
+            word_is_correct = in.readInt();
+            if (word_is_correct == -1) {
                 System.out.println("----[ GUESS MUST BE 10 CHARACTERS LONG ]----");
                 continue;
-            } else {
-                out.writeUTF(guess);
             }
 
             Integer i = in.readInt();
@@ -246,9 +288,6 @@ public class WordleClient {
 
             attempts++;
         }
-
-
-
         return attempts;
     }
 
