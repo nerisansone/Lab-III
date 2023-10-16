@@ -194,7 +194,7 @@ public class WordleClient {
                     flag = false;
                 }
                 else {
-                    System.out.println("[ [1]MENU CHOICE DOES NOT EXIST ]");
+                    System.out.println("----[ MENU CHOICE DOES NOT EXIST ]----");
                     continue;
                 }
             }
