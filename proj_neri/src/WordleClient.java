@@ -282,6 +282,10 @@ public class WordleClient {
 
             attempts++;
         }
+
+        if (attempts >= 12) {
+            System.out.println("----[ YOU LOSE ]----");
+        }
         return attempts;
     }
 

@@ -275,11 +275,15 @@ public class menuHandler implements Runnable {
 
     public static void mess_sender(int port, String host, int n_tentativi,String username, String secret_word) throws UnknownHostException {
         InetAddress ia = InetAddress.getByName(host);
+        String mess;
         
         try (DatagramSocket ds = new DatagramSocket(0)) {
             
-            String mess = username+" guessed the word: "+secret_word+" in "+n_tentativi+" attempts";
-            
+            if (n_tentativi >= 12) {
+                mess = username+" did not guess the word: "+secret_word;
+            } else {
+                mess = username+" guessed the word: "+secret_word+" in "+n_tentativi+" attempts";
+            }
             byte[] data = mess.getBytes("US-ASCII");
             //metto stringa in un un pacchetto e la invio 
             DatagramPacket dp = new DatagramPacket(data, data.length, ia, port);
