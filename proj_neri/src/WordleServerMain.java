@@ -26,41 +26,39 @@ public class WordleServerMain {
     public static int timer_word = 120000;
     public static final String config = "server_config.properties";
     public static void main(String[] args) throws IOException {
-        readConfig();
+        readConfig(); // read config file
         
-        ServerSocket s = new ServerSocket(port);
+        ServerSocket s = new ServerSocket(port); // create server socket
         
 
-        File users = new File("users.json");
-        ArrayList<User> users_list = new ArrayList<User>();
-        if (users.exists()){
+        File users = new File("users.json"); // initiate file for users
+        ArrayList<User> users_list = new ArrayList<User>(); // create list of users
+        if (users.exists()){  // if users file exists, read it
             Gson gson = new Gson();
             JsonReader reader = new JsonReader(new FileReader(users));
             Type list_user_type = new TypeToken<ArrayList<User>>() {}.getType();
             users_list = gson.fromJson(reader,list_user_type);
         }
-        else{ //altrmineti creo file json vuoto
+        else{ //otherwise create it
             users.createNewFile();
         }  
-        //RICONTROLLARE     
-        File file = new File("words.txt");
-        ArrayList<String> words_list = create_dictionary(file);
-        //MANCA ROBA
-        th_properties properties = new th_properties(null, users_list, words_list);
-        Timer timer = new Timer();
-        long delay = 0;
+
+        File file = new File("words.txt"); // initiate file for words
+        ArrayList<String> words_list = create_dictionary(file); // create list of words
+        th_properties properties = new th_properties(null, users_list, words_list); // create properties object that will be given to every thread
+        Timer timer = new Timer(); 
         long period = timer_word;
 
-        timer.scheduleAtFixedRate(new Change_Word(properties), delay, period);
-        ExecutorService executor = Executors.newCachedThreadPool();
+        timer.scheduleAtFixedRate(new Change_Word(properties), 0, period);  // schedule the timer that will change the word every 2 minutes
+        ExecutorService executor = Executors.newCachedThreadPool(); // create thread pool
 
         boolean flag = true;
 
         try {
 
-            while(flag) {
+            while(flag) { // accept connections and create threads
                 Socket socket = s.accept();
-                System.out.println("Client connected");
+                System.out.println("----[ NEW CONNECTION ]----");
                 try {
                     executor.execute(new menuHandler(socket, host, port_2, properties));
                 } catch (Exception e) {
@@ -71,12 +69,12 @@ public class WordleServerMain {
             
         } 
         catch(IOException e){
-            System.out.println("Exception caught when trying to listen on port " + port + " or listening for a connection");
+            System.out.println("----[ ERROR ACCEPTING CONNECTION ]----");
         }
         s.close();
     }
 
-    public static ArrayList<String> create_dictionary(File f) throws FileNotFoundException{
+    public static ArrayList<String> create_dictionary(File f) throws FileNotFoundException{ // create dictionary from file
         Scanner s = new Scanner(f);
         ArrayList<String> dictionary = new ArrayList<String>();
         while (s.hasNext()){
@@ -86,12 +84,11 @@ public class WordleServerMain {
         return dictionary;
     }
 
-    public static void readConfig() throws FileNotFoundException, IOException {
+    public static void readConfig() throws FileNotFoundException, IOException { // read config file
 		InputStream input = new FileInputStream(config);
         Properties prop = new Properties();
         prop.load(input);
         port = Integer.parseInt(prop.getProperty("port"));
-        //timer_word = Integer.parseInt(prop.getProperty("timer"));
         host = prop.getProperty("host");
         port_2 = Integer.parseInt(prop.getProperty("port_2"));
         input.close();

@@ -17,21 +17,21 @@ public class WordleClientMain {
     public static final String config = "client_config.properties";
     public static void main(String[] args) throws IOException {
 
-        readConfig();
+        readConfig(); // read config file
 
-        Socket socket = new Socket(host, port);
-        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-        DataInputStream in = new DataInputStream(socket.getInputStream());
-        Scanner scan = new Scanner(System.in);
-
+        Socket socket = new Socket(host, port); // create socket
+        DataOutputStream out = new DataOutputStream(socket.getOutputStream()); // create output stream
+        DataInputStream in = new DataInputStream(socket.getInputStream()); // create input stream 
+        Scanner scan = new Scanner(System.in); // create scanner for the CLI
+ 
         boolean flag = true;
 
         Integer choice_menu_1 = 0;
         Integer choice_menu_2 = 0;
 
         try {
-            System.out.println("Client connected");
-            System.out.println("Socket" + socket);
+            System.out.println("----[ WELCOME TO WORDLE ]----");
+            //System.out.println("Socket" + socket);
 
             try {
                 while (flag) {
@@ -39,38 +39,38 @@ public class WordleClientMain {
                 System.out.println("\nREGISTER [1] \nLOGIN [2]\nEXIT [3]\n");
                 try {
                     
-                    choice_menu_1 = Integer.parseInt(scan.nextLine());
+                    choice_menu_1 = Integer.parseInt(scan.nextLine()); // read choice first menu
                 
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException e) { // catch exception if input is not a number
                 
-                    System.out.println("Input is not a number");
+                    System.out.println("----[ ERROR INPUT IS NOT A NUMBER ]----");
                 
                     continue;
                 }
 
-                out.writeInt(choice_menu_1);
+                out.writeInt(choice_menu_1); // send first choice to server
 
-                if (choice_menu_1 == 1) {
+                if (choice_menu_1 == 1) { // register
                     
                     System.out.println("----[ ENTER USERNAME ]----");
-                    String username = scan.nextLine();
+                    String username = scan.nextLine(); // read username
 
-                    while (username.trim().isEmpty()) {
+                    while (username.trim().isEmpty()) { // check if username is empty
                         System.out.println("----[ USERNAME CAN NOT BE EMPTY ]----");
                         System.out.println("---[ INSERT A DIFFERENT USERNAME: ]---");
                         username = scan.nextLine();
                     }
                     
-                    out.writeUTF(username);
-                    if (in.readInt() == -1) {
-                        System.out.println("Username already exists");
+                    out.writeUTF(username); // send username to server
+                    if (in.readInt() == -1) { // check if username already exists
+                        System.out.println("----[ USERNAME ALREADY EXISTS ]----");
                         continue;
                     }
 
                     System.out.println("----[ ENTER PASSWORD ]----");
-                    String password = scan.nextLine();
+                    String password = scan.nextLine(); // read password
 
-                    while (password.trim().isEmpty()) {
+                    while (password.trim().isEmpty()) { // check if password is empty
                         System.out.println("----[ PASSWORD CAN NOT BE EMPTY ]----");
                         System.out.println("----[ INSERT A DIFFERENT PASSWORD: ]---");
 
@@ -81,82 +81,82 @@ public class WordleClientMain {
                     
                     int user_exists = in.readInt();
 
-                    if (user_exists == -1) {
-                        System.out.println("Username already exists");
+                    /* if (user_exists == -1) { // check if username already exists
+                        System.out.println("----[ USERNAME ALREADY EXISTS ]----");
                         continue;
-                    } else if (user_exists == 0 ) {
-                        System.out.println("Registration successful");
+                    } else */ if (user_exists == 0 ) {
+                        System.out.println("----[ REGISTRATION SUCCESSFUL ]----");
                         continue;
                     }
                 }
-                else if (choice_menu_1 == 2) {
+                else if (choice_menu_1 == 2) { // login
                     
-                    System.out.println("Enter username: ");
-                    String username = scan.nextLine();
+                    System.out.println("----[ ENTER USERNAME ]----]");
+                    String username = scan.nextLine(); // read username
 
-                    out.writeUTF(username);
+                    out.writeUTF(username); // send username to server
                     
-                    int user_exists = in.readInt();
+                    int user_exists = in.readInt(); // check if username exists
 
-                    int attempt = 0;
+                    int attempt = 1; // number of attempts initialized otherwise it gives error
 
-                    if (user_exists == 0) {
+                    if (user_exists == 0) { // if username exists
                         
-                        System.out.println("Enter password: ");
-                        String password = scan.nextLine();
+                        System.out.println("----[ ENTER PASSWORD ]----");
+                        String password = scan.nextLine(); // read password
 
-                        out.writeUTF(password);
+                        out.writeUTF(password); // send password to server
 
-                        int password_correct = in.readInt();
+                        int password_correct = in.readInt(); // check if password is correct
 
-                        if (password_correct == -1) {
-                            System.out.println("Password is incorrect");
+                        if (password_correct == -1) { // if password is not correct
+                            System.out.println("----[ WRONG PASSWORD OR USER ALREADY LOGGED ]----");
                             continue;
-                        } else {
+                        } else { // if password IS correct
                             
-                            System.out.println("\nLogin successful");
-                            Mess_Receiver mess_receiver = new Mess_Receiver(port_2, group);
+                            System.out.println("----[ LOGIN SUCCESSFUL ]----");
+                            Mess_Receiver mess_receiver = new Mess_Receiver(port_2, group); // create new thread for multicast
                             Thread t = new Thread(mess_receiver);
                             t.start();
                             boolean logout = false;
 
-                            while (!logout) {
+                            while (!logout) { // while user is logged in
                                 System.out.println("------------------------------------");
                                 System.out.println("\nPLAY [1] \nSTATISTICS [2] \nSHARE [3] \nSHOW ME SHARING [4]\nLOGOUT [5]\n");
 
                                 try {
                                     choice_menu_2 = Integer.parseInt(scan.nextLine());
-                                    if (choice_menu_2 == 1) {
+                                    if (choice_menu_2 == 1) { // play
                                         //Integer player_can_play = in.readInt();
-                                        out.writeInt(1);
-                                        Integer already_played = in.readInt();
+                                        out.writeInt(1); // send choice to server
+                                        Integer already_played = in.readInt(); // check if word has already been played
 
-                                        if (already_played == 0) {
+                                        if (already_played == 0) { // if word has not been played
                                             System.out.println("----[ GAME STARTING ]----");
 
-                                            try{
+                                            try{ // try to play game
                                                 attempt = WordleGame(scan, in, out);
                                             } catch (Exception e) {
                                                 System.out.println("----[ ERROR PLAYING GAME]----");
                                                 flag = false;
                                                 logout = true;
                                             }
-                                        } else if (already_played == -1) {
+                                        } else if (already_played == -1) { // if word has already been played
                                             System.out.println("----[ YOU HAVE ALREADY PLAYED THIS WORD ]----");
                                         } else {
                                             System.out.println("----[ ERROR PLAYING GAME ]----");
                                         }
 
-                                    } else if (choice_menu_2 == 2) {
+                                    } else if (choice_menu_2 == 2) { // statistics 
                                         out.writeInt(2);
                                         print_statistics(in);
 
-                                    } else if (choice_menu_2 == 3) {
+                                    } else if (choice_menu_2 == 3) { // share
                                         out.writeInt(3);
                                         int player_can_share = in.readInt();
 
                                         if (player_can_share == 0) {
-                                            out.writeInt(attempt);
+                                            out.writeInt(attempt); 
                                             System.out.println("----[ MESSAGE SHARED ]----");
                                         } 
                                         else {
@@ -164,13 +164,13 @@ public class WordleClientMain {
                                         }
                                         continue;
 
-                                    } else if (choice_menu_2 == 4) {
+                                    } else if (choice_menu_2 == 4) { // show me sharing
 
                                         mess_receiver.print_mess();
                                         continue;
 
-                                    } else if (choice_menu_2 == 5) {
-                                        System.out.println("Logging out...");
+                                    } else if (choice_menu_2 == 5) { // logout
+                                        System.out.println("----[ LOGGING OUT ]----");
                                         out.writeInt(5);
                                         mess_receiver.close_connection();
                                         logout = true;
@@ -189,20 +189,20 @@ public class WordleClientMain {
                     }
 
                 }
-                else if (choice_menu_1 == 3) {
-                    System.out.println("[CLOSING GAME]");
+                else if (choice_menu_1 == 3) { // exit
+                    System.out.println("----[ CLOSING GAME ]----");
                     flag = false;
                 }
-                else {
+                else { // if choice is not 1, 2 or 3
                     System.out.println("----[ MENU CHOICE DOES NOT EXIST ]----");
                     continue;
                 }
             }
-            } catch (SocketException e) {
+            } catch (SocketException e) { // catch exception if server is not reachable
                 System.out.println("----[ SERVER NOT REACHABLE ]----");
             }
         }   
-        finally {
+        finally { // close socket and scanner after the try block
             System.out.println("----[ GAME CLOSED ]----");
             scan.close();
             socket.close();
@@ -213,69 +213,40 @@ public class WordleClientMain {
     public static int WordleGame (Scanner scanner, DataInputStream in, DataOutputStream out) throws IOException {
 
         boolean guessed = false;
-        Integer attempts = 0;
+        Integer attempts = 1;
 
-        while (!guessed && attempts < 12) {
+        while (!guessed && attempts < 12) { // while word has not been guessed and attempts are less than 12
             
             System.out.println("----[ ENTER GUESS: ]----");
 
-            if (attempts == 11 ) {
+            if (attempts == 11 ) { // if last attempt
                 System.out.println("----[ ONE LAST ATTEMPT REMAINING ]----");
             }
 
-            String guess = scanner.nextLine();
-            out.writeUTF(guess);
-            Integer word_is_correct = 0;
+            String guess = scanner.nextLine(); // read guess
+            out.writeUTF(guess); // send guess to server
+            //Integer word_is_correct = 0; // check if word is correct
             
-
-            /* try {
-                word_is_correct = in.readInt();
-                if (word_is_correct == -1) {
-                    System.out.println("----[ GUESS MUST BE 10 CHARACTERS LONG ]----");
-                    continue;
-                }
-
-                Integer i = in.readInt();
-                if (i == 0) {
-                String hints = in.readUTF();
-
-                    if (guess.equals(hints)) {
-                        System.out.println("----[ YOU WIN ]----");
-                        guessed = true;
-                    } else {
-                        System.out.println(hints);
-                    }  
-                } else if (i == -1) {
-                    System.out.println("----[ WORD DOES NOT EXIST ]----");
-                    continue;
-                } else {
-                    System.out.println("----[ ERROR ]----");
-                    continue;
-                }
-            } catch (Exception e) {
-                System.out.println("----[ ERROR REACHING SERVER ]----");
-                break;
-            } */
-            word_is_correct = in.readInt();
-            if (word_is_correct == -1) {
+            Integer word_is_correct = in.readInt(); // read if word is correct
+            if (word_is_correct == -1) { // if word is not correct
                 System.out.println("----[ GUESS MUST BE 10 CHARACTERS LONG ]----");
                 continue;
             }
 
-            Integer i = in.readInt();
+            Integer i = in.readInt(); // read if the guess is valid
             if (i == 0) {
-              String hints = in.readUTF();
+              String hints = in.readUTF(); // receive the "hinted" word
 
-                if (guess.equals(hints)) {
+                if (guess.equals(hints)) { // if the guess is equal to the word
                     System.out.println("----[ YOU WIN ]----");
                     guessed = true;
                 } else {
-                    System.out.println(hints);
+                    System.out.println(hints); // print the "hinted" word
                 }  
-            } else if (i == -1) {
+            } else if (i == -1) { // if the guess is not valid
                 System.out.println("----[ WORD DOES NOT EXIST ]----");
                 continue;
-            } else {
+            } else { 
                 System.out.println("----[ ERROR ]----");
                 continue;
             }
@@ -289,7 +260,7 @@ public class WordleClientMain {
         return attempts;
     }
 
-    public static void print_statistics(DataInputStream in) throws IOException {
+    public static void print_statistics(DataInputStream in) throws IOException { // print statistics
         int games_played = in.readInt();
         System.out.println("Games played : "+games_played);
         int games_won = in.readInt();
@@ -308,12 +279,11 @@ public class WordleClientMain {
         }
     }
 
-    public static void readConfig() throws FileNotFoundException, IOException {
+    public static void readConfig() throws FileNotFoundException, IOException { // read config file
 		InputStream input = new FileInputStream(config);
         Properties prop = new Properties();
         prop.load(input);
         port = Integer.parseInt(prop.getProperty("port"));
-        //timer_word = Integer.parseInt(prop.getProperty("timer"));
         host = prop.getProperty("host");
         port_2 = Integer.parseInt(prop.getProperty("port_2"));
         group = prop.getProperty("group");
