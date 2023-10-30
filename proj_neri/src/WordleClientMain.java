@@ -213,7 +213,7 @@ public class WordleClientMain {
     public static int WordleGame (Scanner scanner, DataInputStream in, DataOutputStream out) throws IOException {
 
         boolean guessed = false;
-        Integer attempts = 1;
+        Integer attempts = 0;
 
         while (!guessed && attempts < 12) { // while word has not been guessed and attempts are less than 12
             

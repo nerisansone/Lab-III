@@ -149,7 +149,7 @@ public class menuHandler implements Runnable {
             in.close();
             out.close(); 
         } catch (Exception e) { // handling unexpected client disconnection
-            System.out.println("----[ CLIENT UNEXPECTEDLY DISCONNECTED ]----");
+            System.out.println("----[ CLIENT DISCONNECTED ]----");
             login.logged = false;
         }
     }   
