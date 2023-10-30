@@ -1,2 +1,0 @@
-Main-Class: WordleServerMain
-Class-Path: ../libs/gson-2.10.jar
