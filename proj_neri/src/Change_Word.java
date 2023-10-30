@@ -17,22 +17,21 @@ public class Change_Word extends TimerTask{
     }
 
     public void run() {
-        //cambia la parola da indovinare
+        //changes secret word and sets play_this_word to false for all users
         info.word = extract_word(info.words_list);
-        //aggiornare variabile booleana play_this_word per permettere agli utenti di giocare la nuova parola
+
         now_can_play_again(info.users_list);
         try {
-            //backup lista utenti con variabile per giocare aggiornata
+            //update the lists with the new datas
             backup_server_users(info.users_list);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //Usato per visualizzare la secret_word sul server per test in quanto troppo difficile indovinare
         System.out.println("New secret word : " + info.word);
     }
 
-    //estrae una parola a caso dal dictionary
-    //trasformo arraylist in array ed estraggo un indice a caso dal quale prendere una parola
+    //randomly choses a word from the dictionary
+    //casting to ArrayList in order make easier the random choice
     public String extract_word(ArrayList<String> dictionary){
         String[] diz = dictionary.toArray(new String[0]);
         Random random = new Random();
@@ -40,7 +39,7 @@ public class Change_Word extends TimerTask{
         return diz[i];
     }
 
-    //Modifica la variabile play_this_word di tutti gli utenti in modo da permettergli di giocare la nuova parola
+    //sets play_this_word to false for all users
     public void now_can_play_again(ArrayList<User> users_list){
         Iterator<User> iter = users_list.iterator();
         while(iter.hasNext()){
@@ -49,7 +48,7 @@ public class Change_Word extends TimerTask{
         }
     }
 
-    //Sovrascrive il file users.json con l'users_list aggiornata 
+    //updates the users.json file 
     public synchronized void backup_server_users(ArrayList<User> users_list) throws IOException{
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         File users_file = new File("users.json");
@@ -57,8 +56,5 @@ public class Change_Word extends TimerTask{
         String s_json = gson.toJson(users_list);
         fw.write(s_json);
         fw.close();
-    }
-
-
-    
+    }    
 }

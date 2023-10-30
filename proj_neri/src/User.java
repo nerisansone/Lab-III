@@ -1,8 +1,6 @@
 import java.util.HashMap;
 
-//Usato solo come oggetto statico
-//Contiene solo informazioni che secondo me sono necessarie e utili da memorizzare per ogni utente 
-//i nomi delle variabili dovrebbero essere autoesplicativi e non necessitare di commento
+//Class that represents a user with all his relevant attributes
 public class User {
     String username;
     String password;
@@ -38,8 +36,6 @@ public class User {
         map.put(10,0);
         map.put(11,0);
         map.put(12,0);
-        //questa mappa presenta come chiavi il numero di tentativi effettuati per indovinare una parola
-        //e come valore il numero di parole indovinate con quei tentativi
         this.guess_distribution = map; 
 
     }

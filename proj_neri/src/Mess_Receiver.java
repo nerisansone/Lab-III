@@ -18,7 +18,7 @@ public class Mess_Receiver implements Runnable {
     public Mess_Receiver(int port, String host){
         this.port = port;
         this.host = host;
-        //Repository -> Struttura che conterrà messaggi che arrivano sul multicast 
+        //the repository is used to store all the messages received from the server 
         this.repository = new ArrayList<String>();
         //Variabile boolleana per uscire dal while 
         this.exit = false;
@@ -26,18 +26,16 @@ public class Mess_Receiver implements Runnable {
 
     public void run(){
         byte[] buf = new byte[128];
-        try {
+        try { // open the multicast, connect to the multicast 
             InetAddress ia = InetAddress.getByName(host);
             DatagramPacket dp = new DatagramPacket(buf, buf.length);
-            //Apertura multicast
             MulticastSocket ms = new MulticastSocket(port);
-            //Unione al multicast per ricevere messaggi che arrivano ad esso 
-            //utilizzo del metodo spiegato a lezione benchè deprecato 
+            //it uses old version of the method but we've seen it in class 
             ms.joinGroup(ia);
-            //Timeout usato per creare una via d'uscita dal while dato che se no la receive sarebbe bloccante
+            //timeout for leaving the group (otherwise it would be stuck in the while)
             ms.setSoTimeout(200);
-            //Aspetta di ricevere messaggi dal server degli utenti
-            //Non appena l'utente loggato sul client effettua il logout e il timer scatta o arriva un ultimo messaggio termina 
+            //receive messages from the server and add them to the repository
+            //the while is used to keep receiving messages until the user wants to exit 
             while(exit==false){
                 try{
                     ms.receive(dp);
@@ -50,9 +48,8 @@ public class Mess_Receiver implements Runnable {
                     continue;
                 }
             }
-            //abbandono multicast group
+            //leaves the group and closes the socket
             ms.leaveGroup(ia);
-            //chiudo multicastSocket
             ms.close();
         } 
         
@@ -62,13 +59,11 @@ public class Mess_Receiver implements Runnable {
             e.printStackTrace();
         }
     }
-    //Usato per cambiare la variabile della guardia del while
-    //fa uscire dal while e quindi il codice continua e chiude la connessione
+    
     public void close_connection(){ 
         this.exit = true;
     }
 
-    //Permette di stampare la lista di tutti i messaggi raccolti fino a quando viene chiamata
     public synchronized void print_mess(){
         Iterator<String> iter = repository.iterator();
         while (iter.hasNext()) {
