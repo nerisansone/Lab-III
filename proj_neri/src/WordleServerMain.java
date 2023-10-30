@@ -19,7 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
-public class WordleServer {
+public class WordleServerMain {
     public static int port;
     public static int port_2;
     public static String host;

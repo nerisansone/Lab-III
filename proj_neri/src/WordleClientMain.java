@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 
-public class WordleClient {
+public class WordleClientMain {
     public static int port;
     public static String host;
     public static String group;
