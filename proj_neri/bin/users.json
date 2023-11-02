@@ -8,7 +8,7 @@
     "victory_rate": 100,
     "victory_streak": 1,
     "max_victory_streak": 1,
-    "logged": true,
+    "logged": false,
     "guess_distribution": {
       "1": 1,
       "2": 0,
