@@ -19,7 +19,14 @@ public class WordleClientMain {
 
         readConfig(); // read config file
 
-        Socket socket = new Socket(host, port); // create socket
+        Socket socket = null; // initialize socket
+
+        try {
+            socket = new Socket(host, port); // create socket
+        } catch (SocketException e) {
+            System.out.println("----[ SERVER NOT REACHABLE ]----");
+            System.exit(0);
+        }
         DataOutputStream out = new DataOutputStream(socket.getOutputStream()); // create output stream
         DataInputStream in = new DataInputStream(socket.getInputStream()); // create input stream 
         Scanner scan = new Scanner(System.in); // create scanner for the CLI
@@ -52,7 +59,7 @@ public class WordleClientMain {
 
                 if (choice_menu_1 == 1) { // register
                     
-                    System.out.println("----[ ENTER USERNAME ]----");
+                    System.out.println("----[ ENTER USERNAME: ]----");
                     String username = scan.nextLine(); // read username
 
                     while (username.trim().isEmpty()) { // check if username is empty
@@ -67,7 +74,7 @@ public class WordleClientMain {
                         continue;
                     }
 
-                    System.out.println("----[ ENTER PASSWORD ]----");
+                    System.out.println("----[ ENTER PASSWORD: ]----");
                     String password = scan.nextLine(); // read password
 
                     while (password.trim().isEmpty()) { // check if password is empty
@@ -91,7 +98,7 @@ public class WordleClientMain {
                 }
                 else if (choice_menu_1 == 2) { // login
                     
-                    System.out.println("----[ ENTER USERNAME ]----]");
+                    System.out.println("----[ ENTER USERNAME ]----");
                     String username = scan.nextLine(); // read username
 
                     out.writeUTF(username); // send username to server

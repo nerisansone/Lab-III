@@ -48,7 +48,7 @@ public class menuHandler implements Runnable {
                     
                     if (checkUser(username, properties.users_list)) { // checks if it is valid
                         out.writeInt(-1);
-                        System.out.println("----[ USERNAME ALREADY EXISTS ]----]");
+                        System.out.println("----[ USERNAME ALREADY EXISTS ]----");
                         
                     }
                     else {
@@ -138,12 +138,12 @@ public class menuHandler implements Runnable {
                             }
                         } else {
                             out.writeInt(-1); //password is incorrect
-                            System.out.println("----[ WRONG PASSWORD   ]----]");
+                            System.out.println("----[ WRONG PASSWORD ]----");
                             continue;
                         }
 
                     } else {
-                        System.out.println("----[ USERNAME DOES NOT EXIST ]----]");
+                        System.out.println("----[ USERNAME DOES NOT EXIST ]----");
                         out.writeInt(-1); // username does not exist
                         continue;
                     }
