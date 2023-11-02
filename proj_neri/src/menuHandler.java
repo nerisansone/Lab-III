@@ -35,6 +35,7 @@ public class menuHandler implements Runnable {
         User new_user = null;
         User login = null;
         String secret_word = "";
+        start_logged(properties.users_list); // in order to avoid problems of log in at the start of the server I set the logged field of every user to false
 
         try { //open the streams 
             DataOutputStream out = new DataOutputStream(this.socket.getOutputStream());
@@ -94,10 +95,16 @@ public class menuHandler implements Runnable {
                                 if (scelta2 == 1) { // play game
                                 
                                     if (login.play_this_word == false) { // checks if the user has already played this word
-                                        login.play_this_word = true; 
+                                         
                                         out.writeInt(0); // the game can start
                                         secret_word = properties.word;
+                                        try {
                                         WordleGame(login, properties.word, properties.words_list, in, out); // the game starts
+                                        } catch (Exception e) {
+                                            login.logged = false;
+                                            break;
+                                        }
+                                        login.play_this_word = true;
                                     } else {
                                         out.writeInt(-1); // already played this word
                                     }
@@ -168,6 +175,15 @@ public class menuHandler implements Runnable {
         return result;
     }
 
+    public synchronized void start_logged (ArrayList<User> users_list) { // function that sets all the users to not logged
+        Iterator<User> iterator = users_list.iterator();
+
+        while (iterator.hasNext()) {
+            User user_to_check = iterator.next();
+            user_to_check.logged = false;
+        } 
+    }
+
     public synchronized void update_users_list (ArrayList<User> users_list) throws IOException { // function that updates the json file
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         File users_file = new File("users.json");
@@ -227,7 +243,7 @@ public class menuHandler implements Runnable {
                         if (user.victory_streak > user.max_victory_streak) {
                             user.max_victory_streak = user.victory_streak;
                         }
-                        System.out.println(attempts);
+                        //System.out.println(attempts);
                         up_guess_distribution(user, attempts);
                         guessed = true;
                     }
@@ -250,8 +266,8 @@ public class menuHandler implements Runnable {
         }
 
         user.games_played++; // update the user's statistics
-        System.out.println("Won" + user.games_won);
-        System.out.println(user.games_played);
+        //System.out.println("Won" + user.games_won);
+        //System.out.println(user.games_played);
         user.victory_rate = (int) (((float)user.games_won/(float)user.games_played)*100);
     }
 
